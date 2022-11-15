@@ -24,7 +24,7 @@ class ClutchControl:
         hardware = "HARDWARE"
         
         
-    def __init__(self, mode = MODE.simulation):        
+    def __init__(self, mode = MODE.hardware):        
         self.__mode__ = mode
         self.run = True
         self.camera_clutch_pressed = False
@@ -301,7 +301,7 @@ class ClutchControl:
             if self.camera_clutch_pressed == False:
                 self.camera_clutch_pressed = True
                 self.mtml_starting_point = None
-                self.teleop_thread.pause()
+                #self.teleop_thread.pause() #############################ADD PUBLISH FALSE TO RUN TELEOP
                 self.hw_mtml_orientation.lock_orientation_as_is()
 #                 self.hw_mtmr_orientation.lock_orientation_as_is()
 #                 self.teleop_thread.lock_mtm_orientations()
@@ -309,7 +309,7 @@ class ClutchControl:
         elif self.camera_clutch_pressed == True:
             self.camera_clutch_pressed = False
             if self.head_sensor_pressed:
-                self.teleop_thread.resume()
+                #self.teleop_thread.resume()
                 self.hw_mtml_orientation.unlock_orientation()
 #                 self.hw_mtmr_orientation.unlock_orientation()
             
@@ -445,9 +445,12 @@ class ClutchControl:
 if __name__ == "__main__":
     print("Running Clutch Control")
     rospy.init_node('clutch_and_move')
-    c = ClutchControl()
+    node_handler = ClutchControl()
+    __mode__ = node_handler.MODE.hardware
+    print('\nRunning {} in {}\n'.format("Clutch and Move",__mode__))
+    node_handler.set_mode(__mode__)    
     try:
-        c.spin()
+        node_handler.spin()
     except rospy.ROSInterruptException:
         pass
     
